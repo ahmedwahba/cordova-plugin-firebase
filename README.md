@@ -334,7 +334,7 @@ window.FirebasePlugin.setDefaults(defaults, "namespace");
 [IOS](https://github.com/silverio/cordova-plugin-firebase) & [ANDROID](https://github.com/apptum/cordova-plugin-firebase)
 ,Also [the last one](https://github.com/jestcastro/cordova-plugin-firebase)
 
-** Important:**
+**Important:**
 
 *FOR IOS: SETUP YOUR PUSH NOTIFICATIONS FIRST, AND VERIFY THAT THEY ARE ARRIVING TO YOUR PHYSICAL DEVICE BEFORE YOU TEST THIS METHOD. USE THE APNS AUTH KEY TO GENERATE THE .P8 FILE AND UPLOAD IT TO FIREBASE.
 WHEN YOU CALL THIS METHOD, FCM SENDS A SILENT PUSH TO THE DEVICE TO VERIFY IT.*
