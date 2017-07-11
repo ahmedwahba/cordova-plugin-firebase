@@ -6,13 +6,13 @@ Android and iOS supported (including iOS 10).
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
 
-Install the plugin by adding it your project's config.xml:
-```
-<plugin name="cordova-plugin-firebase" spec="0.1.21" />
-```
-or by running:
+Install the original version of the plugin without authentication
 ```
 cordova plugin add cordova-plugin-firebase@0.1.21 --save
+```
+or install from current contribution with phone authentication via repo. URL
+```
+cordova plugin add https://github.com/ahmedwahba/cordova-plugin-firebase
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
@@ -380,7 +380,7 @@ window.FirebasePlugin.verifyPhoneNumberWithCode(verifyId, code,function(res) {
 
 ### signOut
 
-This method to sign out user from current firebase session 
+This method to sign out user from current firebase session
 
 ```
 window.FirebasePlugin.signOut();
