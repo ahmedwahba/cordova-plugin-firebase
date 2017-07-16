@@ -64,7 +64,7 @@ static FirebasePlugin *firebasePlugin;
         enabled = application.enabledRemoteNotificationTypes != UIRemoteNotificationTypeNone;
 #pragma GCC diagnostic pop
     }
-    
+
     NSMutableDictionary* message = [NSMutableDictionary dictionaryWithCapacity:1];
     [message setObject:[NSNumber numberWithBool:enabled] forKey:@"isEnabled"];
     CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:message];
@@ -136,19 +136,67 @@ NSDictionary *message;
                 };
 
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
-                                                                                                        
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId]; 
-    
+
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
   } else {
     // Successful.
 CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:verificationID];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId]; 
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }
 }];
 
-     
-    
+
+
 }
+
+
+
+- (void)verifyPhoneNumberWithCode:(CDVInvokedUrlCommand *)command {
+    NSString* verificationId = [command.arguments objectAtIndex:0];
+    NSString* code = [command.arguments objectAtIndex:1];
+
+    FIRAuthCredential *credential = [[FIRPhoneAuthProvider provider]
+                                     credentialWithVerificationID:verificationId
+                                     verificationCode:code];
+
+    [self signInWithPhoneAuthCredential:credential command:command];
+
+
+}
+
+
+-(void) signInWithPhoneAuthCredential:(FIRAuthCredential *) credential command:(CDVInvokedUrlCommand *)command{
+    [[FIRAuth auth] signInWithCredential:credential
+                              completion:^(FIRUser *user, NSError *error) {
+                              NSDictionary *message;
+                              NSDictionary *successResult;
+                                  if (error) {
+                                      message = @{
+                                                @"code": [NSNumber numberWithInteger:error.code],
+                                                @"description": error.description == nil ? [NSNull null] : error.description
+                                            };
+
+                                      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+
+                                      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                                  }
+                                  else
+                                  {
+                                      successResult = @{
+                                                @"success": @YES,
+                                                @"credential": credential
+                                            };
+                                      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:successResult];
+                                      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                                  }
+
+                                  // User successfully signed in. Get user data from the FIRUser object
+                                  // ...
+                              }];
+}
+
+
 
 - (void)getBadgeNumber:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
@@ -161,18 +209,18 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
 
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
     NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
-    
+
     [[FIRMessaging messaging] subscribeToTopic: topic];
-    
+
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)unsubscribe:(CDVInvokedUrlCommand *)command {
     NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
-    
+
     [[FIRMessaging messaging] unsubscribeFromTopic: topic];
-    
+
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -205,7 +253,7 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
         if (!self.notificationStack) {
             self.notificationStack = [[NSMutableArray alloc] init];
         }
-        
+
         // stack notifications until a callback has been registered
         [self.notificationStack addObject:userInfo];
 
@@ -227,9 +275,9 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
     [self.commandDelegate runInBackground:^{
         NSString* name = [command.arguments objectAtIndex:0];
         NSDictionary* parameters = [command.arguments objectAtIndex:1];
-        
+
         [FIRAnalytics logEventWithName:name parameters:parameters];
-        
+
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -247,9 +295,9 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
 - (void)setUserId:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* id = [command.arguments objectAtIndex:0];
-        
+
         [FIRAnalytics setUserID:id];
-        
+
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -259,9 +307,9 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
     [self.commandDelegate runInBackground:^{
         NSString* name = [command.arguments objectAtIndex:0];
         NSString* value = [command.arguments objectAtIndex:1];
-        
+
         [FIRAnalytics setUserPropertyString:value forName:name];
-        
+
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -301,7 +349,7 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
          } else {
              pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
          }
-         
+
          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
      }];
 }
