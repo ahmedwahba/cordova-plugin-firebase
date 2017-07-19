@@ -185,7 +185,7 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
                                   {
                                       successResult = @{
                                                 @"success": @YES,
-                                                @"credential": credential
+                                                @"credential": credential.description
                                             };
                                       CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:successResult];
                                       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
