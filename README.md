@@ -329,7 +329,7 @@ window.FirebasePlugin.setDefaults(defaults);
 window.FirebasePlugin.setDefaults(defaults, "namespace");
 ```
 
-## Phone Authentication
+## [Phone Authentication](https://github.com/ahmedwahba/cordova-plugin-firebase/wiki)
 **BASED ON THE CONTRIBUTIONS OF**
 [IOS](https://github.com/silverio/cordova-plugin-firebase) & [ANDROID](https://github.com/apptum/cordova-plugin-firebase)
 ,Also [the last one](https://github.com/jestcastro/cordova-plugin-firebase)
