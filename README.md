@@ -365,13 +365,13 @@ Using Ionic2?
 
 ### verifyPhoneNumberWithCode
 
-This method to complete phone number authentication process by signing in user to firebase and return success with the credential if there a need to be verified later.
+This method to complete phone number authentication process by signing in user to firebase and return success with the idToken if there a need to be verified later on your [server](https://firebase.google.com/docs/auth/admin/verify-id-tokens).
 
 ```
 window.FirebasePlugin.verifyPhoneNumberWithCode(verifyId, code,function(res) {
                 console.log(res);
                 // res.success : flag for success sign in to firebase
-                // res.credential : firebase authentication credential  
+                // res.credential : firebase idToken to be verified   
 
             }, function(error) {             
                 console.error(error);

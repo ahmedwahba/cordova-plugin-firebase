@@ -42,6 +42,10 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+
 
 public class FirebasePlugin extends CordovaPlugin {
 
@@ -624,7 +628,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             // for instance if the the phone number format is not valid.
                             Log.w(TAG, "failed: verifyPhoneNumber.onVerificationFailed ", e);
 
-                            String errorMsg = "unknown error verifying number";
+                            String errorMsg = "UNKNOWN ERROR verifying number : " + Log.getStackTraceString(e); ;
                             if (e instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The phone number is invalid
                                 errorMsg = "Invalid phone number";
@@ -689,18 +693,32 @@ public class FirebasePlugin extends CordovaPlugin {
                        if (task.isSuccessful()) {
                            // Sign in success, update UI with the signed-in user's information
                            Log.d(TAG, "signInWithCredential:success");
-                           //FirebaseUser user = task.getResult().getUser();
-                           JSONObject returnResults = new JSONObject();
-                           try {
-                               returnResults.put("success", true);
-                               returnResults.put("credential", credential);
-                           } catch (JSONException e) {
-                               callbackContext.error(e.getMessage());
-                               return;
-                           }
-                           PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, returnResults);
-                           pluginresult.setKeepCallback(true);
-                           callbackContext.sendPluginResult(pluginresult);
+                           FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                           user.getToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                               public void onComplete(@NonNull Task<GetTokenResult> tokenTask) {
+                                   if (tokenTask.isSuccessful()) {
+                                       String idToken = tokenTask.getResult().getToken();
+                                       // Send token to your backend via HTTPS
+                                       JSONObject returnResults = new JSONObject();
+                                       try {
+                                           returnResults.put("success", true);
+                                           returnResults.put("credential", idToken);
+                                           PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, returnResults);
+                                           pluginresult.setKeepCallback(true);
+                                           callbackContext.sendPluginResult(pluginresult);
+                                       } catch (JSONException e) {
+                                           callbackContext.error(e.getMessage());
+                                           return;
+                                       }
+                                      
+                                   } else {
+                                       // Handle error -> task.getException();
+                                       callbackContext.error(task.getException().getMessage());
+                                   }
+                               }
+                           });
+                          
+                           
 
                        } else {
                            // Sign in failed, display a message and update the UI

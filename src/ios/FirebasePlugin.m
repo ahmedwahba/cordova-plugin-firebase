@@ -183,17 +183,38 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
                                   }
                                   else
                                   {
-                                      successResult = @{
-                                                @"success": @YES,
-                                                @"credential": credential.description
-                                            };
-                                      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:successResult];
-                                      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                                  }
+                                    [user getTokenForcingRefresh:YES
+                                        completion:^(NSString *_Nullable idToken,
+                                         NSError *_Nullable error) {
+                                          if (error) {
+                                                    message = @{
+                                                    @"code": [NSNumber numberWithInteger:error.code],
+                                                    @"description": error.description == nil ? [NSNull null] : error.description
+                                                  };
 
-                                  // User successfully signed in. Get user data from the FIRUser object
-                                  // ...
-                              }];
+                                                  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+
+                                                  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                                                  return;
+                                           } else {
+
+                                                    // Send token to your backend via HTTPS
+                                                successResult = @{
+                                                    @"success": @YES,
+                                                    @"credential": idToken
+                                                };
+                                                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:successResult];
+                                                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                                          }
+
+                                             // User successfully signed in. Get user data from the FIRUser object
+                                              // ...
+
+                                         }];
+                                  }
+                                  
+                              
+    }];
 }
 
 
