@@ -712,7 +712,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                       
                                    } else {
                                        // Handle error -> task.getException();
-                                       callbackContext.error(task.getException().getMessage());
+                                       callbackContext.error(tokenTask.getException().getMessage());
                                    }
                                }
                            });
