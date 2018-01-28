@@ -169,8 +169,8 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
 -(void) signInWithPhoneAuthCredential:(FIRAuthCredential *) credential command:(CDVInvokedUrlCommand *)command{
     [[FIRAuth auth] signInWithCredential:credential
                               completion:^(FIRUser *user, NSError *error) {
-                              NSDictionary *message;
-                              NSDictionary *successResult;
+                              __block NSDictionary *message = nil;
+                              __block NSDictionary *successResult = nil;
                                   if (error) {
                                       message = @{
                                                 @"code": [NSNumber numberWithInteger:error.code],
